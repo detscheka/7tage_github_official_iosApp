@@ -1,0 +1,116 @@
+{
+  "images" : [
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-20@2x.png",
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "size" : "20x20"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-20@3x.png",
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "size" : "20x20"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-29@2x.png",
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-29@3x.png",
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-40@2x.png",
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "size" : "40x40"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-40@3x.png",
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "size" : "40x40"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-60@2x.png",
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "size" : "60x60"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-60@3x.png",
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "size" : "60x60"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-20.png",
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "size" : "20x20"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-20@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "20x20"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-29.png",
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-29@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-40.png",
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "size" : "40x40"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-40@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "40x40"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-76.png",
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "size" : "76x76"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-76@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "76x76"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-83.5@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "83.5x83.5"
+    },
+    {
+      "filename" : "9406d4d3-f0d2-40ab-842f-a04a2bdb974d_200x200-1024.png",
+      "idiom" : "ios-marketing",
+      "scale" : "1x",
+      "size" : "1024x1024"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
