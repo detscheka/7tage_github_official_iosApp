@@ -17,7 +17,7 @@ class LocationViewModel: NSObject, ObservableObject{
     @Published var userLongitude: Double = 0
     @Published var userTown: String = ""
     @Published var incidency: Int = 0
-    @Published var color: UIColor = UIColor.green
+    @Published var color: UIColor = UIColor.init(red: 159/255, green: 252/255, blue: 172/255, alpha: 1)
   
   private let locationManager = CLLocationManager()
   
@@ -121,8 +121,7 @@ extension LocationViewModel: CLLocationManagerDelegate {
         let lat3 = String(format: "%.3f", self.userLatitude)
         let long3 = String(format: "%.3f", self.userLongitude)
         var incidency = 0
-        var color = UIColor.green
-        
+        var color = UIColor.init(red: 159/255, green: 252/255, blue: 172/255, alpha: 1)
         
         let loc = CLLocation.init(latitude: self.userLatitude, longitude: self.userLongitude)
         CLGeocoder().reverseGeocodeLocation(loc) { placemarks, error in

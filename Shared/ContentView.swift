@@ -229,11 +229,11 @@ struct ContentView: View {
                 
             } else {
                 Text("\(locationViewModel.userTown)").font(.system(size: CGFloat(30.0)))
-            }
-            
-            HStack {
-                Text("\(locationViewModel.incidency)").foregroundColor(.black).fontWeight(.bold).font(.system(size: CGFloat(40.0)))
-                Circle().foregroundColor(Color(locationViewModel.color)).frame(width: 30, height: 30)
+                
+                HStack {
+                    Text("\(locationViewModel.incidency)").foregroundColor(.black).fontWeight(.bold).font(.system(size: CGFloat(40.0)))
+                    Circle().foregroundColor(Color(locationViewModel.color)).frame(width: 30, height: 30)
+                }
             }
 
             Divider().foregroundColor(.black)
@@ -300,6 +300,7 @@ struct ContentView: View {
         if ((userSearchLat != 0) && (userSearchLong != 0))
         {
             getData(userLatitude: userSearchLat, userLongitude: userSearchLong)
+            showDetails = true
         }
     }
     
