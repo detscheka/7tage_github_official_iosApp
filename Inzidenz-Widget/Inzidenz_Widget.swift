@@ -12,6 +12,8 @@ import CoreLocation
 struct Provider: TimelineProvider {
     var widgetLocationManager = WidgetLocationManager()
     
+    let smallSymbolImage = UIImage(systemName: "location", withConfiguration: UIImage.SymbolConfiguration(scale: .small))
+    
     struct ReversedGeoLocation {
         let name: String            // eg. Apple Inc.
         let streetName: String      // eg. Infinite Loop
@@ -181,6 +183,118 @@ struct Provider: TimelineProvider {
         var two = 0
         var locationManagerEntered = 0
         
+        let userSearchLong = readFromDefaultDouble(key: "userSearchLong", defVal: 0.0)
+        let userSearchLat = readFromDefaultDouble(key: "userSearchLat", defVal: 0.0)
+        
+        /* First load the user saved data */
+        
+        print("Color before if")
+        print(color)
+        print(incidency)
+        
+        if ((userSearchLong != 0) && (userSearchLat != 0))
+        {
+            /* Display also second town data */
+            two = 1
+            
+            let lat3user = String(format: "%.3f", userSearchLat)
+            let long3user = String(format: "%.3f", userSearchLong)
+
+                
+                if let url = URL(string: "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=RS,GEN,cases7_bl_per_100k,cases7_per_100k,BL&geometry=\(long3user)%2C\(lat3user)&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelWithin&returnGeometry=false&outSR=4326&f=json") {
+                   URLSession.shared.dataTask(with: url) { data, response, error in
+                      if let data = data {
+                         if let jsonString = String(data: data, encoding: .utf8) {
+                            print(jsonString)
+                            let array = jsonString.components(separatedBy: ":")
+                            let interestingVal = array[array.count - 2]
+                            let arrTwo = interestingVal.components(separatedBy: ",")
+                            var incid = Double(arrTwo[0])
+                            incid = floor(incid!)
+                            print(incid)
+                            
+                            let landkreisVal = array[array.count - 4]
+                            let arrLandkreis = landkreisVal.components(separatedBy: ",")
+                            var landkreis = arrLandkreis[0]
+                            print(landkreis)
+                            landkreis = landkreis.replacingOccurrences(of: "\"", with: "")
+                            townSearch = landkreis
+                            
+                            incidencySearch = Int(ceil(incid!))
+                            print("incidencySearch = \(incidencySearch)")
+                            
+                            DispatchQueue.main.async {
+                                townSearch = landkreis
+                                incidencySearch = Int(ceil(incid!))
+                            }
+                            
+                            if (incidencySearch <= 35)
+                            {
+                                colorSearch = Color.init(.sRGB, red: 159/255, green: 252/255, blue: 172/255, opacity: 1)
+                            }
+                            
+                            if ((incidencySearch <= 50) && (incidencySearch > 35))
+                            {
+                                colorSearch = Color.init(.sRGB, red: 228/255, green: 210/255, blue: 88/255, opacity: 1)
+                            }
+                            
+                            if ((incidencySearch <= 100) && (incidencySearch > 50))
+                            {
+                                colorSearch = Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1)
+                            }
+                            
+                            if ((incidencySearch <= 200) && (incidencySearch > 100))
+                            {
+                                colorSearch = Color.init(.sRGB, red: 136/255, green: 37/255, blue: 17/255, opacity: 1)
+                            }
+                            
+                            if ((incidencySearch <= 300) && (incidencySearch > 200))
+                            {
+                                colorSearch = Color.init(.sRGB, red: 49/255, green: 13/255, blue: 4/255, opacity: 1)
+                            }
+                            
+                            if ((incidencySearch > 300))
+                            {
+                                colorSearch = Color.init(.sRGB, red: 20/255, green: 5/255, blue: 1/255, opacity: 1)
+                            }
+                            
+                            print("User saved data in if:")
+                            print(townSearch)
+                            print(incidencySearch)
+                            print(colorSearch)
+                            
+                            print("Color:")
+                            print(color)
+                        
+                            let status: CLAuthorizationStatus = CLLocationManager.authorizationStatus()
+                            if ((status == .denied) || (status == .restricted) || (status == .notDetermined))
+                            {
+                                print("No authorization. Quitting with empty timeline.")
+                                
+                                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
+
+                                let timeline = Timeline(entries: [entry], policy: .atEnd)
+                                completion(timeline)
+                            }
+                         }
+                       }
+                   }.resume()
+                }
+        } else {
+            let status: CLAuthorizationStatus = CLLocationManager.authorizationStatus()
+            if ((status == .denied) || (status == .restricted) || (status == .notDetermined))
+            {
+                print("No authorization. Quitting with empty timeline.")
+                
+                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
+
+                let timeline = Timeline(entries: [entry], policy: .atEnd)
+                completion(timeline)
+            }
+        }
+        
+        print("Loading normal data...")
+        
         widgetLocationManager.fetchLocation(handler: { location in
             print(location.coordinate.longitude)
             print(location.coordinate.latitude)
@@ -209,7 +323,6 @@ struct Provider: TimelineProvider {
                 print(reversedGeoLocation.city)
                 
                 town = reversedGeoLocation.city
-//                WidgetCenter.shared.reloadAllTimelines()
                 
                 if let url = URL(string: "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=RS,GEN,cases7_bl_per_100k,cases7_per_100k,BL&geometry=\(long3)%2C\(lat3)&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelWithin&returnGeometry=false&outSR=4326&f=json") {
                    URLSession.shared.dataTask(with: url) { data, response, error in
@@ -231,6 +344,11 @@ struct Provider: TimelineProvider {
                             town = landkreis
                             
                             incidency = Int(ceil(incid!))
+                            
+                            DispatchQueue.main.async {
+                                town = landkreis
+                                incidency = Int(ceil(incid!))
+                            }
                             
                             if (incidency <= 35)
                             {
@@ -262,226 +380,22 @@ struct Provider: TimelineProvider {
                                 color = Color.init(.sRGB, red: 20/255, green: 5/255, blue: 1/255, opacity: 1)
                             }
                             
-                            var userSearchLong = readFromDefaultDouble(key: "userSearchLong", defVal: 0.0)
-                            var userSearchLat = readFromDefaultDouble(key: "userSearchLat", defVal: 0.0)
-                            
-                            print("Color before if")
-                            print(color)
-                            print(incidency)
-                            
-                            if ((userSearchLong != 0) && (userSearchLat != 0))
-                            {
-                                /* Display also second town data */
-                                two = 1
-                                
-                                let lat3user = String(format: "%.3f", userSearchLat)
-                                let long3user = String(format: "%.3f", userSearchLong)
-                                
-                                let locationUser = CLLocation(latitude: userSearchLat, longitude: userSearchLong)
-                                CLGeocoder().reverseGeocodeLocation(locationUser) { placemarks, error in
-
-                                    guard let placemark = placemarks?.first else {
-                                        let errorString = error?.localizedDescription ?? "Unexpected Error"
-                                        print("Unable to reverse geocode the given location. Error: \(errorString)")
-                                        return
-                                    }
-
-                                    let reversedGeoLocation = ReversedGeoLocation(with: placemark)
-                                    print(reversedGeoLocation.city)
-                                    
-                                    if let url = URL(string: "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=RS,GEN,cases7_bl_per_100k,cases7_per_100k,BL&geometry=\(long3user)%2C\(lat3user)&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelWithin&returnGeometry=false&outSR=4326&f=json") {
-                                       URLSession.shared.dataTask(with: url) { data, response, error in
-                                          if let data = data {
-                                             if let jsonString = String(data: data, encoding: .utf8) {
-                                                print(jsonString)
-                                                let array = jsonString.components(separatedBy: ":")
-                                                let interestingVal = array[array.count - 2]
-                                                let arrTwo = interestingVal.components(separatedBy: ",")
-                                                var incid = Double(arrTwo[0])
-                                                incid = floor(incid!)
-                                                print(incid)
-                                                
-                                                let landkreisVal = array[array.count - 4]
-                                                let arrLandkreis = landkreisVal.components(separatedBy: ",")
-                                                var landkreis = arrLandkreis[0]
-                                                print(landkreis)
-                                                landkreis = landkreis.replacingOccurrences(of: "\"", with: "")
-                                                townSearch = landkreis
-                                                
-                                                incidencySearch = Int(ceil(incid!))
-                                                print("incidencySearch = \(incidencySearch)")
-                                                
-                                                if (incidencySearch <= 35)
-                                                {
-                                                    colorSearch = Color.init(.sRGB, red: 159/255, green: 252/255, blue: 172/255, opacity: 1)
-                                                }
-                                                
-                                                if ((incidencySearch <= 50) && (incidencySearch > 35))
-                                                {
-                                                    colorSearch = Color.init(.sRGB, red: 228/255, green: 210/255, blue: 88/255, opacity: 1)
-                                                }
-                                                
-                                                if ((incidencySearch <= 100) && (incidencySearch > 50))
-                                                {
-                                                    colorSearch = Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1)
-                                                }
-                                                
-                                                if ((incidencySearch <= 200) && (incidencySearch > 100))
-                                                {
-                                                    colorSearch = Color.init(.sRGB, red: 136/255, green: 37/255, blue: 17/255, opacity: 1)
-                                                }
-                                                
-                                                if ((incidencySearch <= 300) && (incidencySearch > 200))
-                                                {
-                                                    colorSearch = Color.init(.sRGB, red: 49/255, green: 13/255, blue: 4/255, opacity: 1)
-                                                }
-                                                
-                                                if ((incidencySearch > 300))
-                                                {
-                                                    colorSearch = Color.init(.sRGB, red: 20/255, green: 5/255, blue: 1/255, opacity: 1)
-                                                }
-                                                
-                                                print("User saved data in if:")
-                                                print(townSearch)
-                                                print(incidencySearch)
-                                                print(colorSearch)
-                                                
-                                                print("Color:")
-                                                print(color)
-                                                
-                                                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 1, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
-
-                                                let timeline = Timeline(entries: [entry], policy: .atEnd)
-                                                completion(timeline)
-                                             }
-                                           }
-                                       }.resume()
-                                    }
-                                }
-                            }
-                            
                             print("User saved data:")
                             print(townSearch)
                             print(incidencySearch)
                             print(colorSearch)
-                            
-                            if (two == 0)
-                            {
-                                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
 
-                                let timeline = Timeline(entries: [entry], policy: .atEnd)
-                                completion(timeline)
-                            }
+                            let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
+
+                            let timeline = Timeline(entries: [entry], policy: .atEnd)
+                            completion(timeline)
                          }
                        }
                    }.resume()
                 }
             }
         })
-    
-        if (locationManagerEntered == 0)
-        {
-            /* GPS seems unavailable. Check if second location is present */
-            
-            var userSearchLong = readFromDefaultDouble(key: "userSearchLong", defVal: 0.0)
-            var userSearchLat = readFromDefaultDouble(key: "userSearchLat", defVal: 0.0)
-            
-            if ((userSearchLong != 0) && (userSearchLat != 0))
-            {
-                /* Display also second town data */
-                two = 1
-                
-                let lat3user = String(format: "%.3f", userSearchLat)
-                let long3user = String(format: "%.3f", userSearchLong)
-                
-                let locationUser = CLLocation(latitude: userSearchLat, longitude: userSearchLong)
-                CLGeocoder().reverseGeocodeLocation(locationUser) { placemarks, error in
-
-                    guard let placemark = placemarks?.first else {
-                        let errorString = error?.localizedDescription ?? "Unexpected Error"
-                        print("Unable to reverse geocode the given location. Error: \(errorString)")
-                        return
-                    }
-
-                    let reversedGeoLocation = ReversedGeoLocation(with: placemark)
-                    print(reversedGeoLocation.city)
-                    
-                    if let url = URL(string: "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=RS,GEN,cases7_bl_per_100k,cases7_per_100k,BL&geometry=\(long3user)%2C\(lat3user)&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelWithin&returnGeometry=false&outSR=4326&f=json") {
-                       URLSession.shared.dataTask(with: url) { data, response, error in
-                          if let data = data {
-                             if let jsonString = String(data: data, encoding: .utf8) {
-                                print(jsonString)
-                                let array = jsonString.components(separatedBy: ":")
-                                let interestingVal = array[array.count - 2]
-                                let arrTwo = interestingVal.components(separatedBy: ",")
-                                var incid = Double(arrTwo[0])
-                                incid = floor(incid!)
-                                print(incid)
-                                
-                                let landkreisVal = array[array.count - 4]
-                                let arrLandkreis = landkreisVal.components(separatedBy: ",")
-                                var landkreis = arrLandkreis[0]
-                                print(landkreis)
-                                landkreis = landkreis.replacingOccurrences(of: "\"", with: "")
-                                townSearch = landkreis
-                                
-                                incidencySearch = Int(ceil(incid!))
-                                print("incidencySearch = \(incidencySearch)")
-                                
-                                if (incidencySearch <= 35)
-                                {
-                                    colorSearch = Color.init(.sRGB, red: 159/255, green: 252/255, blue: 172/255, opacity: 1)
-                                }
-                                
-                                if ((incidencySearch <= 50) && (incidencySearch > 35))
-                                {
-                                    colorSearch = Color.init(.sRGB, red: 228/255, green: 210/255, blue: 88/255, opacity: 1)
-                                }
-                                
-                                if ((incidencySearch <= 100) && (incidencySearch > 50))
-                                {
-                                    colorSearch = Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1)
-                                }
-                                
-                                if ((incidencySearch <= 200) && (incidencySearch > 100))
-                                {
-                                    colorSearch = Color.init(.sRGB, red: 136/255, green: 37/255, blue: 17/255, opacity: 1)
-                                }
-                                
-                                if ((incidencySearch <= 300) && (incidencySearch > 200))
-                                {
-                                    colorSearch = Color.init(.sRGB, red: 49/255, green: 13/255, blue: 4/255, opacity: 1)
-                                }
-                                
-                                if ((incidencySearch > 300))
-                                {
-                                    colorSearch = Color.init(.sRGB, red: 20/255, green: 5/255, blue: 1/255, opacity: 1)
-                                }
-                                
-                                print("User saved data in if:")
-                                print(townSearch)
-                                print(incidencySearch)
-                                print(colorSearch)
-                                
-                                print("Color:")
-                                print(color)
-                                
-                                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: 1, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
-
-                                let timeline = Timeline(entries: [entry], policy: .atEnd)
-                                completion(timeline)
-                             }
-                           }
-                       }.resume()
-                    }
-                }
-            } else {
-                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
-
-                let timeline = Timeline(entries: [entry], policy: .atEnd)
-                completion(timeline)
-            }
-        }
+        
     }
 }
 
@@ -517,7 +431,10 @@ struct Inzidenz_WidgetEntryView : View {
                         {
                             Text("GPS nicht verfügbar oder Ort außerhalb von Deutschland :(").foregroundColor(.black).font(.system(size: CGFloat(12.0))).fixedSize(horizontal: false, vertical: true)
                         } else {
-                            Text("\(entry.town):").foregroundColor(.black).font(.system(size: CGFloat(12.0))).fixedSize(horizontal: true, vertical: false)
+                            HStack {
+                                Image.init(systemName: "location").foregroundColor(.black).font(.system(size: 10))
+                                Text("\(entry.town):").foregroundColor(.black).font(.system(size: CGFloat(12.0))).fixedSize(horizontal: true, vertical: false)
+                            }
                             
                             HStack {
                                 Text("\(entry.incidency)").foregroundColor(.black).fontWeight(.bold)

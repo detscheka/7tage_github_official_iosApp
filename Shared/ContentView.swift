@@ -22,7 +22,7 @@ struct WhatsNew: View {
         VStack (alignment: .leading) {
             HStack {
                 Spacer()
-                Text("Was ist neu?").font(.system(size: CGFloat(30.0)))
+                Text("Danke, dass du meine App nutzt!\nWas ist neu?").font(.system(size: CGFloat(30.0)))
                 Spacer()
             }
             
@@ -119,6 +119,8 @@ struct ContentView: View {
     
     // Variable to trigger WhatsNew Screen
     @State private var showWhatsNew = false
+
+    let smallSymbolImage = UIImage(systemName: "location", withConfiguration: UIImage.SymbolConfiguration(scale: .small))
     
     // Get current Version of the App
     func getCurrentAppVersion() -> String {
@@ -228,7 +230,10 @@ struct ContentView: View {
                 }
                 
             } else {
-                Text("\(locationViewModel.userTown)").font(.system(size: CGFloat(30.0)))
+                HStack {
+                    Image.init(uiImage: self.smallSymbolImage!)
+                    Text("\(locationViewModel.userTown)").font(.system(size: CGFloat(30.0)))
+                }
                 
                 HStack {
                     Text("\(locationViewModel.incidency)").foregroundColor(.black).fontWeight(.bold).font(.system(size: CGFloat(40.0)))
@@ -249,30 +254,50 @@ struct ContentView: View {
                 {
                     Button("Wert anzeigen") {
                             hideKeyboard()
-                            showDetails = true
                         
-                        getCoordinateFrom(address: name) { coordinate, error in
-                            guard let coordinate = coordinate, error == nil else { return }
-                            // don't forget to update the UI from the main thread
-                            DispatchQueue.main.async {
-                                self.searchLat = coordinate.latitude
-                                self.searchLong = coordinate.longitude
-                                print(name, "Location:", coordinate) // Rio de Janeiro, Brazil Location: CLLocationCoordinate2D(latitude: -22.9108638, longitude: -43.2045436)
-                                getData(userLatitude: coordinate.latitude, userLongitude: coordinate.longitude)
-                                saveUserSearchCoordinates(lat: coordinate.latitude, long: coordinate.longitude)
+                        if (name != "")
+                        {
+                            showDetails = true
+                            
+                            getCoordinateFrom(address: name) { coordinate, error in
+                                guard let coordinate = coordinate, error == nil else { return }
+                                // don't forget to update the UI from the main thread
+                                DispatchQueue.main.async {
+                                    self.searchLat = coordinate.latitude
+                                    self.searchLong = coordinate.longitude
+                                    print(name, "Location:", coordinate) // Rio de Janeiro, Brazil Location: CLLocationCoordinate2D(latitude: -22.9108638, longitude: -43.2045436)
+                                    getData(userLatitude: coordinate.latitude, userLongitude: coordinate.longitude)
+                                    saveUserSearchCoordinates(lat: coordinate.latitude, long: coordinate.longitude)
+                                }
                             }
+                        } else {
+                            self.showAlertTextEmpty = true
                         }
                         
                         }.buttonStyle(FilledButton())
+                    .alert(isPresented: $showAlertTextEmpty, content: { () -> Alert in
+                        Alert(title: Text("Sorry :("), message: Text("Bitte gebe einen Ortsnamen ein, z.B. 'München' oder 'Frankfurt Main'."), dismissButton: .default(Text("Verstanden")))
+                    })
+                            
             
                     Button("Zu Widget hinzufügen") {
-                        writeDefaultDouble(key: "userSearchLong", val: self.searchLong)
-                        writeDefaultDouble(key: "userSearchLat", val: self.searchLat)
-                        
-                        WidgetCenter.shared.reloadAllTimelines()
+                        if (name != "")
+                        {
+                            writeDefaultDouble(key: "userSearchLong", val: self.searchLong)
+                            writeDefaultDouble(key: "userSearchLat", val: self.searchLat)
+                            showAlertAddToWidget = true
+                            
+                            WidgetCenter.shared.reloadAllTimelines()
+                        } else {
+                            self.showAlertTextEmpty = true
+                        }
+
                         }.buttonStyle(FilledButton())
                     .alert(isPresented: $showAlert) {
                         Alert(title: Text("Sorry :("), message: Text("Entweder konnte dein Ort nicht gefunden werden oder er befindet sich außerhalb Deutschlands. Bitte versuche es erneut."), dismissButton: .default(Text("Verstanden")))
+                    }
+                    .alert(isPresented: $showAlertAddToWidget) {
+                        Alert(title: Text("Ort hinzugefügt."), message: Text("Es kann ein Paar Minuten dauern, bis der neue Ort im Widget erscheint."), dismissButton: .default(Text("Verstanden")))
                     }
                 }
 
@@ -334,6 +359,8 @@ struct ContentView: View {
     }
     
     @State private var showAlert = false;
+    @State private var showAlertTextEmpty = false;
+    @State private var showAlertAddToWidget = false;
     
     func getData(userLatitude: Double, userLongitude: Double)
     {
