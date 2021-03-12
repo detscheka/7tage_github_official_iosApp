@@ -29,11 +29,7 @@ struct WhatsNew: View {
             Spacer()
             
             VStack (alignment: .leading)  {
-                Text("• Die App funktioniert nun stabiler und schneller.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
-                Text("• Abstürze durch Benutzen der App außerhalb von Deutschland wurden behoben.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
-                Text("• Die App kann nun auch außerhalb Deutschlands benutzt werden, allerdings nur für eine manuelle Suche von Orten in Deutschland.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
-                Text("• App und Widget können nun auch ohne Standortfreigabe arbeiten.\nEs wird der Wert aus der manuellen Suche angezeigt.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
-                Text("• Der Ort aus der manuellen Suche wird gespeichert.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                Text("• Probleme mit dem Layout wurden behoben.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
                 Text("\n")
                 Text("• Denke daran, dein GPS anzuschalten, um den aktuellen Wert an deinem Standort zu erhalten.\nOhne GPS kannst du nach Werten an anderen Orten suchen und diese im Widget anzeigen lassen.").font(.system(size: CGFloat(fontSizeWelcomeScreen))).fontWeight(.bold)
             }.offset(x: 5, y: 0)
@@ -59,6 +55,7 @@ struct WhatsNew: View {
     let screenWidth = UIScreen.screenWidth
     let screenHeight = UIScreen.screenHeight
     var fontSizeWelcomeScreen: Double { return(getWelcomeScreenFontSize()) }
+    
     func getWelcomeScreenFontSize() -> Double
         {
     let screenHeightTmp = screenHeight
@@ -128,6 +125,69 @@ struct ContentView: View {
         let version = (appVersion as! String)
 
         return version
+    }
+    
+    let screenWidth = UIScreen.screenWidth
+    let screenHeight = UIScreen.screenHeight
+    var fontSizeGenericMain: Double { return(getWelcomeScreenFontSize()) }
+    
+    func getWelcomeScreenFontSize() -> Double
+    {
+        let screenHeightTmp = screenHeight
+        let screenWidthTmp = screenWidth
+        var font = 30.0
+        
+#if DEBUG_PRINT
+        print(screenHeightTmp)
+        print(screenWidthTmp)
+#endif
+        
+        switch( screenHeightTmp, screenWidthTmp )
+        {
+            case (926, 428):
+            /* iPhone 12 Pro Max*/
+                            font = 30.0
+            case (812, 375):
+            /* iPhone 12 mini */
+                            font = 30.0
+            case (667, 375):
+            /* iPhone SE (2nd generation) || iPhone 8 */
+                            font = 28.0
+            case (568, 320):
+            /* iPod touch (7th generation) || iPhone SE (1st generation) */
+                            font = 22.0
+            case (844, 390):
+            /* iPhone 12 Pro / iPhone 12 */
+                            font = 30.0
+            case (896, 414):
+            /* iPhone 11 Pro Max / iPhone 11 */
+                            font = 30.0
+            case (812, 375):
+            /* iPhone 11 Pro */
+                            font = 30.0
+            case (736, 414):
+            /* iPhone 8 Plus */
+                            font = 30.0
+            case (1366, 1024):
+            /* iPad Pro (12.9-inch) (4th generation) */
+                            font = 30.0
+            case (1194, 834):
+            /* iPad Pro (11 -inch) (2nd generation) */
+                            font = 30.0
+            case (1024, 768):
+            /* iPad Pro (9.7 -inch) */
+                            font = 30.0
+            case (1180, 820):
+            /* iPad Air (4th generation) */
+                            font = 30.0
+            case (1080, 810):
+            /* iPad (8th generation) */
+                            font = 30.0
+            default:
+            print("Unknown device")
+                            font = 30.0
+        }
+        return font
     }
     
     // Check if app if app has been started after update
@@ -216,7 +276,7 @@ struct ContentView: View {
         Spacer()
         
         VStack (alignment: .center) {
-            Text("7-Tages-Wert für").font(.system(size: CGFloat(30.0)))
+            Text("7-Tages-Wert für").font(.system(size: CGFloat(fontSizeGenericMain)))
             .sheet(isPresented: $showWhatsNew, content: { WhatsNew() }) // Show Sheet
             .onAppear(perform: checkForUpdate) // Run checkForUpdate when View Appears
             .onAppear(perform: loadLastUserSearch) // Load last location user searched for
@@ -225,18 +285,18 @@ struct ContentView: View {
             {
                 HStack {
                     Spacer()
-                    Text("GPS nicht verfügbar oder Ort außerhalb von Deutschland :(").font(.system(size: CGFloat(20.0))).fontWeight(.bold)
+                    Text("GPS nicht verfügbar oder Ort außerhalb von Deutschland :(").font(.system(size: CGFloat(fontSizeGenericMain - 10.0))).fontWeight(.bold)
                     Spacer()
                 }
                 
             } else {
                 HStack {
                     Image.init(uiImage: self.smallSymbolImage!)
-                    Text("\(locationViewModel.userTown)").font(.system(size: CGFloat(30.0)))
+                    Text("\(locationViewModel.userTown)").font(.system(size: CGFloat(fontSizeGenericMain)))
                 }
                 
                 HStack {
-                    Text("\(locationViewModel.incidency)").foregroundColor(.black).fontWeight(.bold).font(.system(size: CGFloat(40.0)))
+                    Text("\(locationViewModel.incidency)").foregroundColor(.black).fontWeight(.bold).font(.system(size: CGFloat(fontSizeGenericMain + 10.0)))
                     Circle().foregroundColor(Color(locationViewModel.color)).frame(width: 30, height: 30)
                 }
             }
@@ -245,7 +305,7 @@ struct ContentView: View {
             
             Spacer()
             
-            Text("Wert nach Ort").font(.system(size: CGFloat(30.0)))
+            Text("Wert nach Ort").font(.system(size: CGFloat(fontSizeGenericMain)))
             VStack (alignment: .center, spacing: 30)  {
                 TextField("Ortsname eingeben...", text: $name)
                         .textFieldStyle(RoundedBorderTextFieldStyle()).frame(width: 200, height: 30)
@@ -267,7 +327,7 @@ struct ContentView: View {
                                     self.searchLong = coordinate.longitude
                                     print(name, "Location:", coordinate) // Rio de Janeiro, Brazil Location: CLLocationCoordinate2D(latitude: -22.9108638, longitude: -43.2045436)
                                     getData(userLatitude: coordinate.latitude, userLongitude: coordinate.longitude)
-                                    saveUserSearchCoordinates(lat: coordinate.latitude, long: coordinate.longitude)
+                                    saveUserSearchCoordinatesNextSearch(lat: coordinate.latitude, long: coordinate.longitude)
                                 }
                             }
                         } else {
@@ -297,17 +357,17 @@ struct ContentView: View {
                         Alert(title: Text("Sorry :("), message: Text("Entweder konnte dein Ort nicht gefunden werden oder er befindet sich außerhalb Deutschlands. Bitte versuche es erneut."), dismissButton: .default(Text("Verstanden")))
                     }
                     .alert(isPresented: $showAlertAddToWidget) {
-                        Alert(title: Text("Ort hinzugefügt."), message: Text("Es kann ein Paar Minuten dauern, bis der neue Ort im Widget erscheint."), dismissButton: .default(Text("Verstanden")))
+                        Alert(title: Text("Ort hinzugefügt."), message: Text("Es kann ein Paar Minuten dauern, bis der neue Ort im Widget erscheint. Falls du das Widget noch nicht zum Home-Bildschirm hinzugefügt hast, wiederhole diesen Schritt nach dem Hinzufügen bitte erneut."), dismissButton: .default(Text("Verstanden")))
                     }
                 }
 
                 
                 if showDetails {
-                    Text("7-Tages-Wert für").font(.system(size: CGFloat(30.0)))
-                    Text("\(self.townSearch)").font(.system(size: CGFloat(30.0)))
+                    Text("7-Tages-Wert für").font(.system(size: CGFloat(fontSizeGenericMain)))
+                    Text("\(self.townSearch)").font(.system(size: CGFloat(fontSizeGenericMain)))
                     
                     HStack {
-                        Text("\(incidencySearch)").foregroundColor(.black).fontWeight(.bold).font(.system(size: CGFloat(40.0)))
+                        Text("\(incidencySearch)").foregroundColor(.black).fontWeight(.bold).font(.system(size: CGFloat(fontSizeGenericMain + 10.0)))
                         Circle().foregroundColor(Color(colorSearch)).frame(width: 30, height: 30)
                     }
                 }
@@ -319,8 +379,8 @@ struct ContentView: View {
     
     func loadLastUserSearch()
     {
-        let userSearchLat = readFromDefaultDouble(key: "userSearchLat", defVal: 0)
-        let userSearchLong = readFromDefaultDouble(key: "userSearchLong", defVal: 0)
+        let userSearchLat = readFromDefaultDouble(key: "userSearchLatNext", defVal: 0)
+        let userSearchLong = readFromDefaultDouble(key: "userSearchLongNext", defVal: 0)
         
         if ((userSearchLat != 0) && (userSearchLong != 0))
         {
@@ -329,10 +389,10 @@ struct ContentView: View {
         }
     }
     
-    func saveUserSearchCoordinates(lat: Double, long: Double)
+    func saveUserSearchCoordinatesNextSearch(lat: Double, long: Double)
     {
-        writeDefaultDouble(key: "userSearchLat", val: lat)
-        writeDefaultDouble(key: "userSearchLong", val: long)
+        writeDefaultDouble(key: "userSearchLatNext", val: lat)
+        writeDefaultDouble(key: "userSearchLongNext", val: long)
     }
     
     func getCoordinateFrom(address: String, completion: @escaping(_ coordinate: CLLocationCoordinate2D?, _ error: Error?) -> () ) {

@@ -89,7 +89,7 @@ struct Provider: TimelineProvider {
                 print(location)
             })
         
-        return SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 0, townSearch: "", incidencySearch: 75, colorSearch: Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1))
+        return SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 0, townSearch: "", incidencySearch: 75, colorSearch: Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1), fontSize: 10.0, fontSizeLocationImage: 10.0)
     }
     
     private func loadJson(fromURLString urlString: String,
@@ -162,8 +162,86 @@ struct Provider: TimelineProvider {
             }
         })
         
-        let entry = SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 0, townSearch: "", incidencySearch: 75, colorSearch: Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1))
+        let entry = SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 0, townSearch: "", incidencySearch: 75, colorSearch: Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1), fontSize: 10.0, fontSizeLocationImage: 10.0)
         completion(entry)
+    }
+    
+    func getWelcomeScreenFontSize() -> (CGFloat, CGFloat)
+    {
+        let screenHeight = Int(UIScreen.main.bounds.height)
+        let screenWidth  = Int(UIScreen.main.bounds.width)
+        
+        let screenHeightTmp = screenHeight
+        let screenWidthTmp = screenWidth
+        var font = 10.0
+        var fontLocationImage = 10.0
+        
+#if DEBUG_PRINT
+        print(screenHeightTmp)
+        print(screenWidthTmp)
+#endif
+        
+        switch( screenHeightTmp, screenWidthTmp )
+        {
+            case (926, 428):
+            /* iPhone 12 Pro Max*/
+                font = 10.0
+                fontLocationImage = 10.0
+            case (812, 375):
+            /* iPhone 12 mini */
+                font = 9.0
+                fontLocationImage = 9.0
+            case (667, 375):
+            /* iPhone SE (2nd generation) || iPhone 8 */
+                font = 8.0
+                fontLocationImage = 8.0
+            case (568, 320):
+            /* iPod touch (7th generation) || iPhone SE (1st generation) */
+                font = 7.0
+                fontLocationImage = 8.0
+            case (844, 390):
+            /* iPhone 12 Pro / iPhone 12 */
+                font = 9.0
+                fontLocationImage = 9.0
+            case (896, 414):
+            /* iPhone 11 Pro Max / iPhone 11 */
+                font = 10.0
+                fontLocationImage = 10.0
+            case (812, 375):
+            /* iPhone 11 Pro */
+                font = 10.0
+                fontLocationImage = 10.0
+            case (736, 414):
+            /* iPhone 8 Plus */
+                font = 10.0
+                fontLocationImage = 10.0
+            case (1366, 1024):
+            /* iPad Pro (12.9-inch) (4th generation) */
+                font = 10.0
+                fontLocationImage = 10.0
+            case (1194, 834):
+            /* iPad Pro (11 -inch) (2nd generation) */
+                font = 10.0
+                fontLocationImage = 10.0
+            case (1024, 768):
+            /* iPad Pro (9.7 -inch) */
+                font = 10.0
+                fontLocationImage = 10.0
+            case (1180, 820):
+            /* iPad Air (4th generation) */
+                font = 10.0
+                fontLocationImage = 10.0
+            case (1080, 810):
+            /* iPad (8th generation) */
+                font = 10.0
+                fontLocationImage = 10.0
+            default:
+            print("Unknown device")
+                font = 10.0
+                fontLocationImage = 10.0
+        }
+        
+        return (CGFloat(font), CGFloat(fontLocationImage))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
@@ -192,6 +270,8 @@ struct Provider: TimelineProvider {
         print(color)
         print(incidency)
         
+        let (fontSize, fontSizeLocationImage) = getWelcomeScreenFontSize()
+        
         if ((userSearchLong != 0) && (userSearchLat != 0))
         {
             /* Display also second town data */
@@ -199,7 +279,6 @@ struct Provider: TimelineProvider {
             
             let lat3user = String(format: "%.3f", userSearchLat)
             let long3user = String(format: "%.3f", userSearchLong)
-
                 
                 if let url = URL(string: "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=RS,GEN,cases7_bl_per_100k,cases7_per_100k,BL&geometry=\(long3user)%2C\(lat3user)&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelWithin&returnGeometry=false&outSR=4326&f=json") {
                    URLSession.shared.dataTask(with: url) { data, response, error in
@@ -271,7 +350,7 @@ struct Provider: TimelineProvider {
                             {
                                 print("No authorization. Quitting with empty timeline.")
                                 
-                                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
+                                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage)
 
                                 let timeline = Timeline(entries: [entry], policy: .atEnd)
                                 completion(timeline)
@@ -286,7 +365,7 @@ struct Provider: TimelineProvider {
             {
                 print("No authorization. Quitting with empty timeline.")
                 
-                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
+                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage)
 
                 let timeline = Timeline(entries: [entry], policy: .atEnd)
                 completion(timeline)
@@ -385,7 +464,7 @@ struct Provider: TimelineProvider {
                             print(incidencySearch)
                             print(colorSearch)
 
-                            let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch)
+                            let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage)
 
                             let timeline = Timeline(entries: [entry], policy: .atEnd)
                             completion(timeline)
@@ -411,6 +490,9 @@ struct SimpleEntry: TimelineEntry {
     let townSearch: String
     let incidencySearch: Int
     let colorSearch: Color
+    
+    let fontSize: CGFloat
+    let fontSizeLocationImage: CGFloat
 }
 
 struct Inzidenz_WidgetEntryView : View {
@@ -423,17 +505,17 @@ struct Inzidenz_WidgetEntryView : View {
                 VStack (alignment: .center, spacing: 2) {
                     VStack (alignment: .center, spacing: 5) {
                         Spacer()
-                        Text("7-Tages-Wert").foregroundColor(.black).font(.system(size: CGFloat(10.0)))
+                        Text("7-Tages-Wert").foregroundColor(.black).font(.system(size: entry.fontSize))
                         
                         Divider().foregroundColor(.black)
                         
                         if (entry.town == "")
                         {
-                            Text("GPS nicht verfügbar oder Ort außerhalb von Deutschland :(").foregroundColor(.black).font(.system(size: CGFloat(12.0))).fixedSize(horizontal: false, vertical: true)
+                            Text("Daten werden geladen...").foregroundColor(.black).font(.system(size: entry.fontSize + 2.0)).fixedSize(horizontal: false, vertical: true)
                         } else {
                             HStack {
-                                Image.init(systemName: "location").foregroundColor(.black).font(.system(size: 10))
-                                Text("\(entry.town):").foregroundColor(.black).font(.system(size: CGFloat(12.0))).fixedSize(horizontal: true, vertical: false)
+                                Image.init(systemName: "location").foregroundColor(.black).font(.system(size: entry.fontSizeLocationImage))
+                                Text("\(entry.town):").foregroundColor(.black).font(.system(size: entry.fontSize + 2.0)).fixedSize(horizontal: true, vertical: false)
                             }
                             
                             HStack {
@@ -446,7 +528,7 @@ struct Inzidenz_WidgetEntryView : View {
                         {
                             Divider().foregroundColor(.black)
                             
-                            Text("\(entry.townSearch):").foregroundColor(.black).font(.system(size: CGFloat(12.0))).fixedSize(horizontal: true, vertical: false)
+                            Text("\(entry.townSearch):").foregroundColor(.black).font(.system(size: entry.fontSize + 2.0)).fixedSize(horizontal: true, vertical: false)
                             
                             HStack {
                                 Text("\(entry.incidencySearch)").foregroundColor(.black).fontWeight(.bold)
@@ -456,7 +538,7 @@ struct Inzidenz_WidgetEntryView : View {
                         Divider().foregroundColor(.black)
                     }
                     
-                    Text("Bleiben Sie gesund.").foregroundColor(.black).font(.system(size: CGFloat(12.0))).fixedSize(horizontal: true, vertical: false)
+                    Text("Bleiben Sie gesund.").foregroundColor(.black).font(.system(size: entry.fontSize + 2.0)).fixedSize(horizontal: true, vertical: false)
                     
                     Spacer()
                     Spacer()
@@ -489,7 +571,7 @@ struct Inzidenz_Widget_Previews: PreviewProvider {
         let incidency = 15
         let color = Color.green
         
-        Inzidenz_WidgetEntryView(entry: SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 1, townSearch: "Hof", incidencySearch: 75, colorSearch: .blue))
+        Inzidenz_WidgetEntryView(entry: SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 1, townSearch: "Hof", incidencySearch: 75, colorSearch: .blue, fontSize: 10.0, fontSizeLocationImage: 10.0))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }
