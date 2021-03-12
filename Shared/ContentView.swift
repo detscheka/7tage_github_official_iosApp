@@ -114,13 +114,32 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var locationViewModel = LocationViewModel()
     
-    // Variable to trigger WhatsNew Screen
     @State private var showWhatsNew = false
 
     let smallSymbolImage = UIImage(systemName: "location", withConfiguration: UIImage.SymbolConfiguration(scale: .small))
     
-    // Get current Version of the App
+    
+    func resetDefaults() {
+        let defaults = UserDefaults.standard
+        let dictionary = defaults.dictionaryRepresentation()
+        dictionary.keys.forEach { key in
+            defaults.removeObject(forKey: key)
+        }
+        
+        let defaultsApp = UserDefaults(suiteName: "group.BAgames.incidency")
+        let dictionaryApp = defaultsApp!.dictionaryRepresentation()
+        dictionaryApp.keys.forEach { key in
+            defaults.removeObject(forKey: key)
+        }
+        
+        UserDefaults.init(suiteName: "group.BAgames.incidency")?.removePersistentDomain(forName: "group.BAgames.incidency")
+    }
+    
     func getCurrentAppVersion() -> String {
+#if true
+        resetDefaults()
+#endif
+        
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"]
         let version = (appVersion as! String)
 

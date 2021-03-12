@@ -524,7 +524,7 @@ struct Inzidenz_WidgetEntryView : View {
                             }
                         }
                         
-                        if (entry.twoLocations != 0)
+                        if (entry.twoLocations != 0 && entry.townSearch != "")
                         {
                             Divider().foregroundColor(.black)
                             
