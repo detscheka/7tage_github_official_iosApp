@@ -136,7 +136,7 @@ struct ContentView: View {
     }
     
     func getCurrentAppVersion() -> String {
-#if true
+#if false
         resetDefaults()
 #endif
         
@@ -357,10 +357,13 @@ struct ContentView: View {
                     .alert(isPresented: $showAlertTextEmpty, content: { () -> Alert in
                         Alert(title: Text("Sorry :("), message: Text("Bitte gebe einen Ortsnamen ein, z.B. 'München' oder 'Frankfurt Main'."), dismissButton: .default(Text("Verstanden")))
                     })
+                    .alert(isPresented: $showAlert) {
+                        Alert(title: Text("Sorry :("), message: Text("Entweder konnte dein Ort nicht gefunden werden oder er befindet sich außerhalb Deutschlands. Bitte versuche es erneut."), dismissButton: .default(Text("Verstanden")))
+                    }
                             
             
                     Button("Zu Widget hinzufügen") {
-                        if (name != "")
+                        if (name != "" && townSearch != "")
                         {
                             writeDefaultDouble(key: "userSearchLong", val: self.searchLong)
                             writeDefaultDouble(key: "userSearchLat", val: self.searchLat)
@@ -465,7 +468,7 @@ struct ContentView: View {
                     }
                     
                     incid = floor(incid!)
-                    print(incid)
+                    print(incid!)
                     
                     let landkreisVal = array[array.count - 4]
                     let arrLandkreis = landkreisVal.components(separatedBy: ",")

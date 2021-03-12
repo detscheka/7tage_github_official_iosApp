@@ -558,8 +558,8 @@ struct Inzidenz_Widget: Widget {
             Inzidenz_WidgetEntryView(entry: entry)
         }
         .supportedFamilies([.systemSmall])
-        .configurationDisplayName("My Widget")
-        .description("This is an example widget.")
+        .configurationDisplayName("7-Tage Widget")
+        .description("Dieses Widget zeigt den aktuellen 7-Tage-Wert für deinen aktuellen Standort und für einen weiteren Ort deiner Wahl.")
     }
 }
 
