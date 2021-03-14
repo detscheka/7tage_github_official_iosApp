@@ -10,6 +10,113 @@ import CoreData
 import CoreLocation
 import WidgetKit
 
+struct InfoView: View {
+
+    // Variable to Dismiss Modal
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+
+    var body: some View {
+        ScrollView {
+            HStack {
+                Spacer()
+                Text("Informationen zu dieser App").font(.system(size: CGFloat(30.0)))
+                Spacer()
+            }
+            
+            Spacer()
+            
+            VStack (alignment: .leading)  {
+                Text("Im Folgenden werden, wenn von der 7-Tage App (auch App) die Rede ist, sowohl die 7-Tage App selbst als auch das dazugehörige Widget bezeichnet.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                
+                Text("Was macht diese App?\n\nDie App 7-Tage zeigt Ihnen anhand des aktuellen Standortes oder anhand einer Suche den jeweiligen 7-Tages Wert an. Der Standort oder der gesuchte Ort können nur in Deutschland liegen. Bei einer Suche nach einem Ort werden mit Hilfe von Reverse Geocoding Koordinaten aus dem angegebenen Ort bestimmt.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                
+                Text("Hinweise zum Datenschutz\n\nDer nachfolgende Text informiert Sie über die Datenschtzerklärung dieser App. Falls Daten verarbeitet oder erhoben werden, so geschieht dies immer unter Beachtung der jeweils geltenden Datenschutzverordnungen, der Vorschriften und Prinzipien. Das Angebot dieser App unterliegt den Bestimmungen der Europäischen Danteschutzverordnung, ebenso dem Bundesdatenschutzgesetz (BDSG) sowie auch anderer Datenschutzrichtlinien, die angewendet werden können.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                
+                Text("Weiterführende Informationen zum Datenschutz in dieser App findest du unter https://inzidenz-app.jimdosite.com/privacy-policy/.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                
+                Text("Standortfreigabe\n\nDie App 7-Tage kann entweder mit oder ohne Standortfreigabe genutzt werden. Ist die Standortfreigabe aktiv, so werden die aktuellen Koordinaten genutzt, um den 7-Tage Wert einzuholen. Ohne Standortfreigabe können nur manuell eingegebene Orte nach ihrem 7-Tage Wert durchsicht werden.\nGPS-Koordinaten werden immer nur auf drei Nachkommastellen genau verwendet, um den 7-Tages-Wert zu erhalten.\nFalls Sie in der App die Standortfreigabe erlaubt haben, so werden die Standortdaten zu den folgenden Zwecken verwendet: Informationsanzeige für den aktuellen Standort, ortsbezogene Updates des 7-Tage Wertes. Die Rechtsgrundlage für die Verarbeitung des Standortes ist Art 6 Abs 1 DS-GVO.\nDie Einstellungen zur Standortfreigabe können Sie jederzeit beliebig auf Ihrem Gerät ändern.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                
+                Text("Werden Daten getrackt oder gespeichert?\n Die App 7-Tage trackt während der Nutzung der App keine Daten – es erfolgt daher kein Tracking und auch keine Auswertung der Daten. Daten werden nie an Dritte gesendet oder gespeichert.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                
+                Text("Datenverarbeitung?\n Wenn Sie diese App installieren und nutzen möchten, müssen Sie zunächst eine Nutzungsvereinbarung mit dem App-Store abschließen, um Zugang zum App-Store zu erhalten. Bei der Nutzung des App-Stores werden verschiedene Daten erhoben, dazu gehören z.B. Name, E-Mail Adresse und Informationen des zu nutzenden Gerätes. Auf diese Daten hat diese App keinen Zugriff. Die 7-Tage App ist nicht in die Nutzungsvereinbarung mit dem App-Store involviert und hat daher ebenso keinen Einfluss auf die Verarbeitung der Daten durch den App-Store. Damit gilt an dieser Stelle auch die Datenschtzerklärung des App-Stores.").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+            }
+            
+            Spacer()
+
+            HStack {
+                Spacer()
+                
+                Button(action: { self.presentationMode.wrappedValue.dismiss() }, label: {
+                    Text("Verstanden")
+                }).foregroundColor(.white)
+                .padding()
+                .background(Color.accentColor)
+                .cornerRadius(8)
+                
+                Spacer()
+            }
+            Spacer()
+        }
+    }
+    
+    let screenWidth = UIScreen.screenWidth
+    let screenHeight = UIScreen.screenHeight
+    var fontSizeWelcomeScreen: Double { return(getWelcomeScreenFontSize()) }
+    
+    func getWelcomeScreenFontSize() -> Double
+        {
+    let screenHeightTmp = screenHeight
+    let screenWidthTmp = screenWidth
+    var font = 15.0
+    switch( screenHeightTmp, screenWidthTmp )
+            {
+    case (926, 428):
+    /* iPhone 12 Pro Max*/
+                    font = 17.0
+    case (812, 375):
+    /* iPhone 12 mini */
+                    font = 16.0
+    case (667, 375):
+    /* iPhone SE (2nd generation) || iPhone 8 */
+                    font = 15.0
+    case (568, 320):
+    /* iPod touch (7th generation) */
+                    font = 13.0
+    case (844, 390):
+    /* iPhone 12 Pro / iPhone 12 */
+                    font = 17.0
+    case (896, 414):
+    /* iPhone 11 Pro Max / iPhone 11 */
+                    font = 17.0
+    case (812, 375):
+    /* iPhone 11 Pro */
+                    font = 15.0
+    case (736, 414):
+    /* iPhone 8 Plus */
+                    font = 16.0
+    case (1366, 1024):
+    /* iPad Pro (12.9-inch) (4th generation) */
+                    font = 18.0
+    case (1194, 834):
+    /* iPad Pro (11 -inch) (2nd generation) */
+                    font = 22.0
+    case (1024, 768):
+    /* iPad Pro (9.7 -inch) */
+                    font = 22.0
+    case (1180, 820):
+    /* iPad Air (4th generation) */
+                    font = 22.0
+    case (1080, 810):
+    /* iPad (8th generation) */
+                    font = 22.0
+    default:
+    print("Unknown device")
+                    font = 15.0
+            }
+    return font
+        }
+}
+
 struct WhatsNew: View {
 
     // Variable to Dismiss Modal
@@ -281,7 +388,7 @@ struct ContentView: View {
     @State var name: String = ""
     
     @State private var showDetails = false
-    
+    @State private var showInfoView = false
     
     @State var townSearch: String = ""
     @State var incidencySearch: Int = 0
@@ -295,10 +402,29 @@ struct ContentView: View {
         Spacer()
         
         VStack (alignment: .center) {
-            Text("7-Tages-Wert für").font(.system(size: CGFloat(fontSizeGenericMain)))
-            .sheet(isPresented: $showWhatsNew, content: { WhatsNew() }) // Show Sheet
-            .onAppear(perform: checkForUpdate) // Run checkForUpdate when View Appears
-            .onAppear(perform: loadLastUserSearch) // Load last location user searched for
+            
+            HStack(alignment: .center) {
+                Text("7-Tages-Wert für").font(.system(size: CGFloat(fontSizeGenericMain)))
+                .sheet(isPresented: $showWhatsNew, content: { WhatsNew() }) // Show Sheet
+                .onAppear(perform: checkForUpdate) // Run checkForUpdate when View Appears
+                .onAppear(perform: loadLastUserSearch) // Load last location user searched for
+                .sheet(isPresented: $showInfoView, content: { InfoView() })
+                
+
+                HStack {
+                    Button(action: {
+                        
+                        showInfoView.toggle()
+                        
+                    }) {
+                        HStack {
+                            Image(systemName: "info.circle")
+                        }
+                        .padding()
+                            .mask(Circle())
+                    }
+                }
+            }
             
             if (locationViewModel.userTown == "")
             {
@@ -318,6 +444,19 @@ struct ContentView: View {
                     Text("\(locationViewModel.incidency)").foregroundColor(.black).fontWeight(.bold).font(.system(size: CGFloat(fontSizeGenericMain + 10.0)))
                     Circle().foregroundColor(Color(locationViewModel.color)).frame(width: 30, height: 30)
                 }
+                
+                Button(action: {}) {
+                    HStack {
+                         Text("Zu Widget")
+                            .font(.system(size: CGFloat(fontSizeGenericMain) - 10.0))
+                              .foregroundColor(.white)
+                        
+//                        Image.init(systemName: "star.fill")
+//                              .renderingMode(.original)
+//                              .font(.title)
+//                              .foregroundColor(.blue)
+                    }
+                }.buttonStyle(FilledButton())
             }
 
             Divider().foregroundColor(.black)
@@ -326,7 +465,7 @@ struct ContentView: View {
             
             Text("Wert nach Ort").font(.system(size: CGFloat(fontSizeGenericMain)))
             VStack (alignment: .center, spacing: 30)  {
-                TextField("Ortsname eingeben...", text: $name)
+                TextField("Ortsname oder PLZ eingeben...", text: $name)
                         .textFieldStyle(RoundedBorderTextFieldStyle()).frame(width: 200, height: 30)
                 
                 HStack

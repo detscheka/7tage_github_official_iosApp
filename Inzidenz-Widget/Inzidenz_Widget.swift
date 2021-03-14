@@ -538,8 +538,6 @@ struct Inzidenz_WidgetEntryView : View {
                         Divider().foregroundColor(.black)
                     }
                     
-                    Text("Bleiben Sie gesund.").foregroundColor(.black).font(.system(size: entry.fontSize + 2.0)).fixedSize(horizontal: true, vertical: false)
-                    
                     Spacer()
                     Spacer()
                 }
