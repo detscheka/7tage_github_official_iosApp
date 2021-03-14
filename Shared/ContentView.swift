@@ -34,9 +34,9 @@ struct InfoView: View {
                 
                 Text("Hinweise zum Datenschutz\n\nDer nachfolgende Text informiert Sie über die Datenschtzerklärung dieser App. Falls Daten verarbeitet oder erhoben werden, so geschieht dies immer unter Beachtung der jeweils geltenden Datenschutzverordnungen, der Vorschriften und Prinzipien. Das Angebot dieser App unterliegt den Bestimmungen der Europäischen Danteschutzverordnung, ebenso dem Bundesdatenschutzgesetz (BDSG) sowie auch anderer Datenschutzrichtlinien, die angewendet werden können.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
                 
-                Text("Weiterführende Informationen zum Datenschutz in dieser App finden Sie unter https://inzidenz-app.jimdosite.com/privacy-policy/\nVerantowrtliche Stelle: Alexander Tschekalinskij.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                Text("Weiterführende Informationen zum Datenschutz in dieser App finden Sie unter https://inzidenz-app.jimdosite.com/privacy-policy/\nVerantowortliche Stelle: Alexander Tschekalinskij.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
                 
-                Text("Was ist Gegenstand des Datenschutzes?\n\nDer Gegenstand des Datenschutzes sind in diesem Falle die personenbezogenen Daten. Gemäß Art 4 Nr 1 der DS-GVO sind dies alle Informationen, die sich auf natürliche Personen beziehen, die identifiziert oder identifizierbar sind. Als identifizierbar wird eine natürliche Person angesehen, die direkt oder indirekt, insbesondere mittels Zuordnung zu einer Kennung wie einem Namen, zu einer Kennnummer, zu Standortdaten, zu einer Online-Kennung oder zu einem oder mehreren besonderen Merkmalen, die Ausdruck der physischen, physiologischen, genetischen, psychischen, wirtschaftlichen, kulturellen oder sozialen Identität dieser Person sind, identifiziert werden kann\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
+                Text("Was ist Gegenstand des Datenschutzes?\n\nDer Gegenstand des Datenschutzes sind in diesem Falle die personenbezogenen Daten. Gemäß Art 4 Nr 1 der DS-GVO sind dies alle Informationen, die sich auf natürliche Personen beziehen, die identifiziert oder identifizierbar sind. Als identifizierbar wird eine natürliche Person angesehen, die direkt oder indirekt, insbesondere mittels Zuordnung zu einer Kennung wie einem Namen, zu einer Kennnummer, zu Standortdaten, zu einer Online-Kennung oder zu einem oder mehreren besonderen Merkmalen, die Ausdruck der physischen, physiologischen, genetischen, psychischen, wirtschaftlichen, kulturellen oder sozialen Identität dieser Person sind, identifiziert werden kann.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
                 
                 Text("Datenverarbeitung?\n\nWenn Sie diese App installieren und nutzen möchten, müssen Sie zunächst eine Nutzungsvereinbarung mit dem App-Store abschließen, um Zugang zum App-Store zu erhalten. Bei der Nutzung des App-Stores werden verschiedene Daten erhoben, dazu gehören z.B. Name, E-Mail Adresse und Informationen des zu nutzenden Gerätes. Auf diese Daten hat diese App keinen Zugriff bzw. erhebt diesen nicht. Die 7-Tage App ist nicht in die Nutzungsvereinbarung mit dem App-Store involviert und hat daher ebenso keinen Einfluss auf die Verarbeitung der Daten durch den App-Store. Damit gilt an dieser Stelle auch die Datenschtzerklärung des App-Stores.\n\n").font(.system(size: CGFloat(fontSizeWelcomeScreen)))
                 
@@ -403,6 +403,8 @@ struct ContentView: View {
     @State var searchLat: Double = 0.0
     @State var searchLong: Double = 0.0
     
+    @State private var showLocationValueInWidget = true
+    
     var body: some View {
         
         Spacer()
@@ -451,18 +453,10 @@ struct ContentView: View {
                     Circle().foregroundColor(Color(locationViewModel.color)).frame(width: 30, height: 30)
                 }
                 
-                Button(action: {}) {
-                    HStack {
-                         Text("Zu Widget")
-                            .font(.system(size: CGFloat(fontSizeGenericMain) - 10.0))
-                              .foregroundColor(.white)
-                        
-//                        Image.init(systemName: "star.fill")
-//                              .renderingMode(.original)
-//                              .font(.title)
-//                              .foregroundColor(.blue)
-                    }
-                }.buttonStyle(FilledButton())
+                Toggle(isOn: $showLocationValueInWidget, label: {
+                            Image(systemName: "star.circle")
+                            Text("In Widget anzeigen")
+                }).padding()
             }
 
             Divider().foregroundColor(.black)
@@ -472,7 +466,7 @@ struct ContentView: View {
             Text("Wert nach Ort").font(.system(size: CGFloat(fontSizeGenericMain)))
             VStack (alignment: .center, spacing: 30)  {
                 TextField("Ortsname oder PLZ eingeben...", text: $name)
-                        .textFieldStyle(RoundedBorderTextFieldStyle()).frame(width: 200, height: 30)
+                        .textFieldStyle(RoundedBorderTextFieldStyle()).frame(width: 300, height: 30)
                 
                 HStack
                 {
@@ -507,7 +501,7 @@ struct ContentView: View {
                     }
                             
             
-                    Button("Zu Widget hinzufügen") {
+                    Button("Favorit 1") {
                         if (name != "" && townSearch != "")
                         {
                             writeDefaultDouble(key: "userSearchLong", val: self.searchLong)
@@ -526,8 +520,29 @@ struct ContentView: View {
                     .alert(isPresented: $showAlertAddToWidget) {
                         Alert(title: Text("Ort hinzugefügt."), message: Text("Es kann ein Paar Minuten dauern, bis der neue Ort im Widget erscheint. Falls du das Widget noch nicht zum Home-Bildschirm hinzugefügt hast, wiederhole diesen Schritt nach dem Hinzufügen bitte erneut."), dismissButton: .default(Text("Verstanden")))
                     }
-                }
+                    
+                    
+                    Button("Favorit 2") {
+                        if (name != "" && townSearch != "")
+                        {
+                            writeDefaultDouble(key: "userSearchLong", val: self.searchLong)
+                            writeDefaultDouble(key: "userSearchLat", val: self.searchLat)
+                            showAlertAddToWidget = true
+                            
+                            WidgetCenter.shared.reloadAllTimelines()
+                        } else {
+                            self.showAlertTextEmpty = true
+                        }
 
+                        }.buttonStyle(FilledButton())
+                    .alert(isPresented: $showAlert) {
+                        Alert(title: Text("Sorry :("), message: Text("Entweder konnte dein Ort nicht gefunden werden oder er befindet sich außerhalb Deutschlands. Bitte versuche es erneut."), dismissButton: .default(Text("Verstanden")))
+                    }
+                    .alert(isPresented: $showAlertAddToWidget) {
+                        Alert(title: Text("Ort hinzugefügt."), message: Text("Es kann ein Paar Minuten dauern, bis der neue Ort im Widget erscheint. Falls du das Widget noch nicht zum Home-Bildschirm hinzugefügt hast, wiederhole diesen Schritt nach dem Hinzufügen bitte erneut."), dismissButton: .default(Text("Verstanden")))
+                    }
+                    .disabled(showLocationValueInWidget == true)
+                }
                 
                 if showDetails {
                     Text("7-Tages-Wert für").font(.system(size: CGFloat(fontSizeGenericMain)))
