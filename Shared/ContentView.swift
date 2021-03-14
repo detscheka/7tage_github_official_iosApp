@@ -9,6 +9,7 @@ import SwiftUI
 import CoreData
 import CoreLocation
 import WidgetKit
+import Combine
 
 struct InfoView: View {
 
@@ -405,6 +406,8 @@ struct ContentView: View {
     
     @State private var showLocationValueInWidget = true
     
+    
+    
     var body: some View {
         
         Spacer()
@@ -457,6 +460,11 @@ struct ContentView: View {
                             Image(systemName: "star.circle")
                             Text("In Widget anzeigen")
                 }).padding()
+                .onChange(of: showLocationValueInWidget) { (value) in
+                    print("Toggle pressed!")
+                    toggleAction(State: showLocationValueInWidget)
+                }
+                
             }
 
             Divider().foregroundColor(.black)
@@ -559,6 +567,16 @@ struct ContentView: View {
         }
     }
     
+    func toggleAction(State: Bool)
+    {
+        if (State == true)
+        {
+            writeDefaultInt(key: "locationToggle", val: 1)
+        } else {
+            writeDefaultInt(key: "locationToggle", val: 0)
+        }
+    }
+    
     func loadLastUserSearch()
     {
         let userSearchLat = readFromDefaultDouble(key: "userSearchLatNext", defVal: 0)
@@ -592,6 +610,15 @@ struct ContentView: View {
     }
     
     func writeDefaultDouble(key : String, val : Double)
+    {
+        if let userDefaults = UserDefaults(suiteName: "group.BAgames.incidency") {
+            userDefaults.set(val, forKey: key)
+        } else {
+            print("Error writing default integer for key \(key)!")
+        }
+    }
+    
+    func writeDefaultInt(key : String, val : Int)
     {
         if let userDefaults = UserDefaults(suiteName: "group.BAgames.incidency") {
             userDefaults.set(val, forKey: key)

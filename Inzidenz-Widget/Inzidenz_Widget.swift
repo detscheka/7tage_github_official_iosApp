@@ -59,8 +59,8 @@ struct Provider: TimelineProvider {
         var town = "Nürnberg"
         var lat = 49.452
         var long = 11.077
-        var incidency = 15
-        var color = Color.green
+        let incidency = 15
+        let color = Color.green
         
         widgetLocationManager.fetchLocation(handler: { location in
             print(location.coordinate.longitude)
@@ -89,7 +89,7 @@ struct Provider: TimelineProvider {
                 print(location)
             })
         
-        return SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 0, townSearch: "", incidencySearch: 75, colorSearch: Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1), fontSize: 10.0, fontSizeLocationImage: 10.0)
+        return SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 0, townSearch: "", incidencySearch: 75, colorSearch: Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1), fontSize: 10.0, fontSizeLocationImage: 10.0, userLocationToggle: 1)
     }
     
     private func loadJson(fromURLString urlString: String,
@@ -131,13 +131,23 @@ struct Provider: TimelineProvider {
             return defVal
         }
     }
+    
+    func readFromDefaultInt(key : String, defVal : Int) -> Int
+    {
+        if let userDefaults = UserDefaults(suiteName: "group.BAgames.incidency") {
+            let val = userDefaults.integer(forKey: key)
+            return val
+        } else {
+            return defVal
+        }
+    }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
         var town = "Nürnberg"
         var lat = 49.452
         var long = 11.077
-        var incidency = 15
-        var color = Color.green
+        let incidency = 15
+        let color = Color.green
         
         widgetLocationManager.fetchLocation(handler: { location in
             print(location.coordinate.longitude)
@@ -162,7 +172,7 @@ struct Provider: TimelineProvider {
             }
         })
         
-        let entry = SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 0, townSearch: "", incidencySearch: 75, colorSearch: Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1), fontSize: 10.0, fontSizeLocationImage: 10.0)
+        let entry = SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 0, townSearch: "", incidencySearch: 75, colorSearch: Color.init(.sRGB, red: 191/255, green: 71/255, blue: 42/255, opacity: 1), fontSize: 10.0, fontSizeLocationImage: 10.0, userLocationToggle: 1)
         completion(entry)
     }
     
@@ -263,6 +273,7 @@ struct Provider: TimelineProvider {
         
         let userSearchLong = readFromDefaultDouble(key: "userSearchLong", defVal: 0.0)
         let userSearchLat = readFromDefaultDouble(key: "userSearchLat", defVal: 0.0)
+        let userLocationToggle = readFromDefaultInt(key: "locationToggle", defVal: 1)
         
         /* First load the user saved data */
         
@@ -350,7 +361,7 @@ struct Provider: TimelineProvider {
                             {
                                 print("No authorization. Quitting with empty timeline.")
                                 
-                                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage)
+                                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage, userLocationToggle: Int(userLocationToggle))
 
                                 let timeline = Timeline(entries: [entry], policy: .atEnd)
                                 completion(timeline)
@@ -365,7 +376,7 @@ struct Provider: TimelineProvider {
             {
                 print("No authorization. Quitting with empty timeline.")
                 
-                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage)
+                let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: "", incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage, userLocationToggle: Int(userLocationToggle))
 
                 let timeline = Timeline(entries: [entry], policy: .atEnd)
                 completion(timeline)
@@ -413,7 +424,7 @@ struct Provider: TimelineProvider {
                             let arrTwo = interestingVal.components(separatedBy: ",")
                             var incid = Double(arrTwo[0])
                             incid = floor(incid!)
-                            print(incid)
+                            print(incid ?? "incidency not found...")
                             
                             let landkreisVal = array[array.count - 4]
                             let arrLandkreis = landkreisVal.components(separatedBy: ",")
@@ -464,7 +475,7 @@ struct Provider: TimelineProvider {
                             print(incidencySearch)
                             print(colorSearch)
 
-                            let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage)
+                            let entry = SimpleEntry(date: currentDate, longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: two, townSearch: townSearch, incidencySearch: incidencySearch, colorSearch: colorSearch, fontSize: CGFloat(fontSize), fontSizeLocationImage: fontSizeLocationImage, userLocationToggle: Int(userLocationToggle))
 
                             let timeline = Timeline(entries: [entry], policy: .atEnd)
                             completion(timeline)
@@ -493,6 +504,7 @@ struct SimpleEntry: TimelineEntry {
     
     let fontSize: CGFloat
     let fontSizeLocationImage: CGFloat
+    let userLocationToggle: Int
 }
 
 struct Inzidenz_WidgetEntryView : View {
@@ -512,6 +524,8 @@ struct Inzidenz_WidgetEntryView : View {
                         if (entry.town == "")
                         {
                             Text("Daten werden geladen...").foregroundColor(.black).font(.system(size: entry.fontSize + 2.0)).fixedSize(horizontal: false, vertical: true)
+                        } else if (entry.userLocationToggle == 0) {
+                            /* Nothing to print here, since user deactivated location printing in widget */
                         } else {
                             HStack {
                                 Image.init(systemName: "location").foregroundColor(.black).font(.system(size: entry.fontSizeLocationImage))
@@ -526,7 +540,10 @@ struct Inzidenz_WidgetEntryView : View {
                         
                         if (entry.twoLocations != 0 && entry.townSearch != "")
                         {
-                            Divider().foregroundColor(.black)
+                            if (entry.userLocationToggle == 1)
+                            {
+                                Divider().foregroundColor(.black)
+                            }
                             
                             Text("\(entry.townSearch):").foregroundColor(.black).font(.system(size: entry.fontSize + 2.0)).fixedSize(horizontal: true, vertical: false)
                             
@@ -569,7 +586,7 @@ struct Inzidenz_Widget_Previews: PreviewProvider {
         let incidency = 15
         let color = Color.green
         
-        Inzidenz_WidgetEntryView(entry: SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 1, townSearch: "Hof", incidencySearch: 75, colorSearch: .blue, fontSize: 10.0, fontSizeLocationImage: 10.0))
+        Inzidenz_WidgetEntryView(entry: SimpleEntry(date: Date(), longitude: Float(long), latitude: Float(lat), town: town, incidency: Int(incidency), color: color, twoLocations: 1, townSearch: "Hof", incidencySearch: 75, colorSearch: .blue, fontSize: 10.0, fontSizeLocationImage: 10.0, userLocationToggle: 1))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }
